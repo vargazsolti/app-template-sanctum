@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\UserAdminController;
 use App\Http\Controllers\Web\RolePermissionController;
 use App\Http\Controllers\Web\UserAccessController;
+use App\Http\Controllers\Web\AuditLogController;
 
 
 Route::get('/', function () {
@@ -62,6 +63,10 @@ Route::middleware(['auth', 'permission:admin.access'])->group(function () {
         ->name('admin.access.users.permissions.give');
     Route::delete('/admin/access/users/{user}/permissions/{permission}', [UserAccessController::class, 'revokePermission'])
         ->name('admin.access.users.permissions.revoke');
+
+        // Audit log lista
+    Route::get('/admin/audit', [AuditLogController::class, 'index'])
+        ->name('admin.audit.index');
 });
 
 

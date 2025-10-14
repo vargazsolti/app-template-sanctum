@@ -15,7 +15,7 @@ class RolePermissionController extends Controller
         return view('admin.roles_permissions.index', [
             'roles' => Role::with('permissions')->orderBy('name')->get(),
             'permissions' => Permission::orderBy('name')->get(),
-            'allPermissions' => Permission::orderBy('name')->get(), // select-ekhez
+            'allPermissions' => Permission::orderBy('name')->get(),
         ]);
     }
 
@@ -25,8 +25,14 @@ class RolePermissionController extends Controller
             'name' => ['required','string','max:100','unique:roles,name'],
         ])->validate();
 
-        Role::create(['name' => $data['name']]);
+        $role = Role::create(['name' => $data['name']]);
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()
+            ->performedOn($role)
+            ->causedBy($request->user())
+            ->withProperties(['ip'=>$request->ip(),'user_agent'=>$request->userAgent()])
+            ->log('role_created');
 
         return back()->with('status', 'Role created.');
     }
@@ -35,6 +41,10 @@ class RolePermissionController extends Controller
     {
         $role->delete();
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($role)->causedBy(auth()->user())
+            ->withProperties(['ip'=>request()->ip(),'user_agent'=>request()->userAgent()])
+            ->log('role_deleted');
 
         return back()->with('status', 'Role deleted.');
     }
@@ -45,8 +55,12 @@ class RolePermissionController extends Controller
             'name' => ['required','string','max:150','unique:permissions,name'],
         ])->validate();
 
-        Permission::create(['name' => $data['name']]);
+        $perm = Permission::create(['name' => $data['name']]);
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($perm)->causedBy($request->user())
+            ->withProperties(['ip'=>$request->ip(),'user_agent'=>$request->userAgent()])
+            ->log('permission_created');
 
         return back()->with('status', 'Permission created.');
     }
@@ -56,10 +70,12 @@ class RolePermissionController extends Controller
         $permission->delete();
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
+        activity()->performedOn($permission)->causedBy(auth()->user())
+            ->withProperties(['ip'=>request()->ip(),'user_agent'=>request()->userAgent()])
+            ->log('permission_deleted');
+
         return back()->with('status', 'Permission deleted.');
     }
-
-    // 🔥 ROLE ←→ PERMISSION
 
     public function attachPermissionToRole(Request $request, Role $role)
     {
@@ -67,8 +83,15 @@ class RolePermissionController extends Controller
             'permission' => ['required','string','exists:permissions,name'],
         ])->validate();
 
-        $role->givePermissionTo($data['permission']); // idempotens
+        $role->givePermissionTo($data['permission']);
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($role)->causedBy($request->user())
+            ->withProperties([
+                'ip'=>$request->ip(),
+                'user_agent'=>$request->userAgent(),
+                'permission'=>$data['permission']
+            ])->log('role_permission_attached');
 
         return back()->with('status', "Permission '{$data['permission']}' assigned to role '{$role->name}'.");
     }
@@ -77,6 +100,13 @@ class RolePermissionController extends Controller
     {
         $role->revokePermissionTo($permission);
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($role)->causedBy(auth()->user())
+            ->withProperties([
+                'ip'=>request()->ip(),
+                'user_agent'=>request()->userAgent(),
+                'permission'=>$permission->name
+            ])->log('role_permission_detached');
 
         return back()->with('status', "Permission '{$permission->name}' revoked from role '{$role->name}'.");
     }

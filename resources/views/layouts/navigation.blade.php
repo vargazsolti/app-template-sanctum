@@ -16,10 +16,12 @@
 
                 <!-- Navigation Links (desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <!-- Dashboard -->
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <!-- Admin menu (requires admin.access) -->
                     @if (auth()->user()?->can('admin.access'))
                         @if (RouteFacade::has('admin.users.index'))
                             <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
@@ -36,6 +38,12 @@
                         @if (RouteFacade::has('admin.access.users'))
                             <x-nav-link :href="route('admin.access.users')" :active="request()->routeIs('admin.access.users')">
                                 {{ __('User Access') }}
+                            </x-nav-link>
+                        @endif
+
+                        @if (RouteFacade::has('admin.audit.index'))
+                            <x-nav-link :href="route('admin.audit.index')" :active="request()->routeIs('admin.audit.index')">
+                                {{ __('Audit Log') }}
                             </x-nav-link>
                         @endif
                     @endif
@@ -73,7 +81,7 @@
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
+            <!-- Hamburger (mobile toggle) -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open"
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
@@ -93,10 +101,12 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
+            <!-- Dashboard -->
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            <!-- Admin section -->
             @if (auth()->user()?->can('admin.access'))
                 @if (RouteFacade::has('admin.users.index'))
                     <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
@@ -115,6 +125,12 @@
                         {{ __('User Access') }}
                     </x-responsive-nav-link>
                 @endif
+
+                @if (RouteFacade::has('admin.audit.index'))
+                    <x-responsive-nav-link :href="route('admin.audit.index')" :active="request()->routeIs('admin.audit.index')">
+                        {{ __('Audit Log') }}
+                    </x-responsive-nav-link>
+                @endif
             @endif
         </div>
 
@@ -130,7 +146,7 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
+                <!-- Logout -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"

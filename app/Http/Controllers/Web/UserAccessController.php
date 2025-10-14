@@ -13,11 +13,7 @@ class UserAccessController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::query()
-            ->with(['roles', 'permissions'])
-            ->orderBy('email')
-            ->paginate(15)
-            ->withQueryString();
+        $users = User::with(['roles','permissions'])->orderBy('email')->paginate(15)->withQueryString();
 
         return view('admin.users.access', [
             'users' => $users,
@@ -33,8 +29,11 @@ class UserAccessController extends Controller
         ])->validate();
 
         $user->assignRole($data['role']);
-
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($user)->causedBy($request->user())
+            ->withProperties(['ip'=>$request->ip(),'user_agent'=>$request->userAgent(),'role'=>$data['role']])
+            ->log('user_role_assigned');
 
         return back()->with('status', "Role '{$data['role']}' assigned to {$user->email}.");
     }
@@ -42,8 +41,11 @@ class UserAccessController extends Controller
     public function detachRole(User $user, Role $role)
     {
         $user->removeRole($role);
-
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($user)->causedBy(auth()->user())
+            ->withProperties(['ip'=>request()->ip(),'user_agent'=>request()->userAgent(),'role'=>$role->name])
+            ->log('user_role_removed');
 
         return back()->with('status', "Role '{$role->name}' removed from {$user->email}.");
     }
@@ -55,8 +57,11 @@ class UserAccessController extends Controller
         ])->validate();
 
         $user->givePermissionTo($data['permission']);
-
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($user)->causedBy($request->user())
+            ->withProperties(['ip'=>$request->ip(),'user_agent'=>$request->userAgent(),'permission'=>$data['permission']])
+            ->log('user_permission_given');
 
         return back()->with('status', "Permission '{$data['permission']}' given to {$user->email}.");
     }
@@ -64,8 +69,11 @@ class UserAccessController extends Controller
     public function revokePermission(User $user, Permission $permission)
     {
         $user->revokePermissionTo($permission);
-
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        activity()->performedOn($user)->causedBy(auth()->user())
+            ->withProperties(['ip'=>request()->ip(),'user_agent'=>request()->userAgent(),'permission'=>$permission->name])
+            ->log('user_permission_revoked');
 
         return back()->with('status', "Permission '{$permission->name}' revoked from {$user->email}.");
     }
