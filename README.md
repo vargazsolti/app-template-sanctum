@@ -59,3 +59,72 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# Laravel Installation Guide
+
+## 1️⃣ Installation
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+## 2️⃣ Configure Database
+
+Open the `.env` file and set up your database connection:
+
+```env
+# !! ------ .env --------- !!
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=app
+DB_USERNAME=root
+DB_PASSWORD=
+# !! ------ .env --------- !!
+```
+
+## 3️⃣ Laravel Breeze (Auth scaffolding)
+
+```bash
+composer require laravel/breeze --dev
+php artisan breeze:install blade
+npm install
+npm run dev
+```
+
+
+## 4️⃣ Laravel Sanctum (API Authentication)
+
+```bash
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+```
+
+## 5️⃣ Spatie Permission (Role & Permission Management)
+
+```bash
+composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+```
+
+
+## 6️⃣ Migrate and Seed
+
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+
+## 7️⃣ Optimize and Build
+
+```bash
+composer dump-autoload -o
+npm run dev
+```
+
+✅ **Done!** Your Laravel project is now ready for local development. It will create 10 demo users, admin user : user1@example.com pass: password
+
+
