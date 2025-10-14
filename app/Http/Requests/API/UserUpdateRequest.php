@@ -11,8 +11,7 @@ class UserUpdateRequest extends FormRequest
 
     public function rules(): array
     {
-        // Route model binding: {user} -> App\Models\API\ApiUser $user
-        $user = $this->route('user');
+        $user = $this->route('user'); // ApiUser route binding
 
         return [
             'name' => ['sometimes','string','max:100'],
@@ -20,8 +19,8 @@ class UserUpdateRequest extends FormRequest
                 'sometimes','email','max:255',
                 Rule::unique('users','email')->ignore($user?->id)
             ],
-            // jelszó opcionális; ha küldöd, a controller hash-eli
-            'password' => ['sometimes','string','min:6'],
+            // Ha jelszót küldünk, legyen minimum 8 és megerősítve (password_confirmation)
+            'password' => ['sometimes','string','min:8','confirmed'],
         ];
     }
 }
