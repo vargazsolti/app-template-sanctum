@@ -1,130 +1,164 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel 12 + Sanctum + Breeze (Blade) + Spatie Permission Starter
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A clean and production-ready starter template for building **Laravel 12** applications with:
+- 🧩 Laravel Breeze (Blade) for web session authentication (admin area)
+- 🔐 Sanctum for API token-based authentication (Bearer tokens)
+- 🛡️ Spatie Permission for roles and permissions
+- 🧑‍💼 Basic user management (CRUD + profile + password change)
+- ⚙️ API endpoints (v1 prefix) with permission-based middleware
+- 💾 Example seeders for demo users, base data, and roles/permissions
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Feature | Description |
+|----------|--------------|
+| **Laravel 12 base** | Clean installation with modern directory structure |
+| **Breeze (Blade)** | Web login/register/logout using session auth |
+| **Sanctum API** | Token-based auth for `/api/v1/...` endpoints |
+| **Spatie Roles & Permissions** | Fine-grained access control via middleware |
+| **User CRUD API** | Fully protected endpoints with form requests |
+| **Demo seeders** | Quickly populate with demo users & roles |
+| **Admin panel (Blade)** | Manage users, roles, and permissions |
+| **Password change** | Supports token invalidation + logging |
+| **Postman collection** | For testing API endpoints (`postman/laravel12-sanctum-crud.postman_collection.json`) |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🧱 Folder Structure Highlights
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```
+app/
+ ├── Http/
+ │   ├── Controllers/
+ │   │   ├── API/            # API controllers (Sanctum protected)
+ │   │   └── Web/            # Breeze/Blade controllers (admin)
+ │   ├── Requests/API/       # FormRequest validation for API
+ │   └── Middleware/         # Middleware aliases in bootstrap/app.php
+ ├── Models/
+ │   ├── API/ApiUser.php     # API wrapper model for User
+ │   └── UserBaseData.php    # Extended user base info
+database/
+ ├── seeders/
+ │   ├── DemoUsersAndBaseDataSeeder.php
+ │   ├── RolesAndPermissionsSeeder.php
+ │   └── DatabaseSeeder.php
+resources/
+ └── views/
+     ├── users/              # User management (Blade admin UI)
+     └── admin/              # Roles/permissions management views
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ⚙️ Installation
 
-## Laravel Sponsors
+### 1. Clone repository
+```bash
+git clone https://github.com/<your-username>/app-template-sanctum.git
+cd app-template-sanctum
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-# Laravel Installation Guide
-
-## 1️⃣ Installation
-
+### 2. Install dependencies
 ```bash
 composer install
+npm install && npm run build
+```
+
+### 3. Environment setup
+```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-## 2️⃣ Configure Database
+Adjust your `.env` values (database, app URL, etc).
 
-Open the `.env` file and set up your database connection:
-
-```env
-# !! ------ .env --------- !!
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=app
-DB_USERNAME=root
-DB_PASSWORD=
-# !! ------ .env --------- !!
-```
-
-## 3️⃣ Laravel Breeze (Auth scaffolding)
-
+### 4. Run migrations and seeders
 ```bash
-composer require laravel/breeze --dev
-php artisan breeze:install blade
-npm install
-npm run dev
+php artisan migrate:fresh --seed
 ```
 
+Seeders include demo users, base data, and roles/permissions.
 
-## 4️⃣ Laravel Sanctum (API Authentication)
-
+### 5. Run the server
 ```bash
-composer require laravel/sanctum
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan serve
 ```
 
-## 5️⃣ Spatie Permission (Role & Permission Management)
+Visit `http://127.0.0.1:8000`.
 
-```bash
-composer require spatie/laravel-permission
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+---
+
+## 🔐 Authentication Overview
+
+| Layer | Type | Guard | Purpose |
+|-------|------|--------|----------|
+| **Web (Blade)** | Session | `web` | Admin area login/logout |
+| **API (Sanctum)** | Bearer Token | `sanctum` | Token-based REST API |
+| **Permissions** | Spatie | Middleware | Access control via `permission:` |
+
+---
+
+## 🧩 API Endpoints
+
+| Endpoint | Method | Description | Middleware |
+|-----------|---------|--------------|-------------|
+| `/api/v1/auth/token` | POST | Get API token | Public |
+| `/api/v1/auth/logout` | POST | Revoke current token | auth:sanctum |
+| `/api/v1/me` | GET | Current user data | auth:sanctum |
+| `/api/v1/users` | CRUD | Manage users | permission:users.* |
+| `/api/v1/user-basedata` | CRUD | Manage user base data | permission:user_basedata.* |
+
+All requests require:
+```json
+{ "Accept": "application/json" }
+```
+and for writes (POST/PUT/DELETE):
+```json
+{ "Content-Type": "application/json" }
 ```
 
+---
 
-## 6️⃣ Migrate and Seed
+## 🧑‍💻 Admin Panel (Blade)
 
-```bash
-php artisan migrate
-php artisan db:seed
+After logging in (via Breeze session login), the admin menu provides:
+- **Users**: CRUD and password management
+- **Roles & Permissions**: Create/delete roles and permissions
+- **User Access**: Assign roles/permissions to users
+
+Access is controlled by `users.read` / `users.write` permissions.
+
+---
+
+
+## 🧰 Postman Collection
+
+Import the file:
 ```
-
-
-## 7️⃣ Optimize and Build
-
-```bash
-composer dump-autoload -o
-npm run dev
+postman/laravel12-sanctum-crud.postman_collection.json
 ```
+It includes:
+- Auth (token / me / logout)
+- CRUD for Users and UserBaseData
+- Built-in variable management (`token`, `base_url`)
 
-✅ **Done!** Your Laravel project is now ready for local development. It will create 10 demo users, admin user : user1@example.com pass: password
+---
 
+## 🪵 Logging
 
+- Password changes are logged (`storage/logs/laravel.log`)
+- When passwords are updated, **all Sanctum tokens are revoked** for that user.
+
+---
+
+## 🤝 Contributing
+
+Pull requests and forks are welcome. Please keep all code PSR-12 compliant.
+
+---
+
+## 📄 License
+
+This template is open-source under the **MIT License**.
