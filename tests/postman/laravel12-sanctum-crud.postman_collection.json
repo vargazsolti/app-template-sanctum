@@ -1,0 +1,304 @@
+{
+  "info": {
+    "name": "Laravel 12 Sanctum CRUD",
+    "_postman_id": "d6e8f820-77b2-4d4c-9d91-abc123456789",
+    "description": "Laravel 12 + Sanctum + Spatie Permission CRUD API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Create Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user1@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/token",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "token"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let data = pm.response.json();",
+                  "if (data.token) {",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "  console.log('Token stored:', data.token);",
+                  "} else {",
+                  "  console.warn('No token returned');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Index (GET /users)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Show (GET /users/{id})",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Store (POST /users)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New User\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Update (PUT /users/{id})",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete (DELETE /users/{id})",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "UserBaseData",
+      "item": [
+        {
+          "name": "Index (GET /user-basedata)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user-basedata",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user-basedata"]
+            }
+          }
+        },
+        {
+          "name": "Show (GET /user-basedata/{id})",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user-basedata/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user-basedata", "1"]
+            }
+          }
+        },
+        {
+          "name": "Store (POST /user-basedata)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"full_name\": \"John Doe\",\n  \"mothers_name\": \"Jane Doe\",\n  \"birth_date\": \"1990-01-01\",\n  \"birth_place\": \"Budapest\",\n  \"id_card_number\": \"ID999999\",\n  \"social_security_number\": \"SSN999999\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user-basedata",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user-basedata"]
+            }
+          }
+        },
+        {
+          "name": "Update (PUT /user-basedata/{id})",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"birth_place\": \"Debrecen\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user-basedata/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user-basedata", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete (DELETE /user-basedata/{id})",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user-basedata/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user-basedata", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
