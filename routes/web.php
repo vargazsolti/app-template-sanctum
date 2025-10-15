@@ -6,7 +6,11 @@ use App\Http\Controllers\Web\UserAdminController;
 use App\Http\Controllers\Web\RolePermissionController;
 use App\Http\Controllers\Web\UserAccessController;
 use App\Http\Controllers\Web\AuditLogController;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 
 Route::get('/', function () {
     return view('welcome');
@@ -69,5 +73,51 @@ Route::middleware(['auth', 'permission:admin.access'])->group(function () {
         ->name('admin.audit.index');
 });
 
+/*
+|--------------------------------------------------------------------------
+| SPA JSON Auth endpoints
+|--------------------------------------------------------------------------
+| Ezeket a Vue SPA hívja. Nincs redirect, csak 204/422.
+| A 'web' middleware kell a session cookie-hoz!
+*/
+
+Route::middleware('web')->group(function () {
+    Route::post('/spa/login', function (Request $request) {
+        // Throttle (opcionális, de ajánlott)
+        $key = Str::lower($request->input('email')).'|'.$request->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            return response()->json(['message' => 'Too many attempts.'], 429);
+        }
+
+        $credentials = $request->validate([
+            'email' => ['required','email'],
+            'password' => ['required','string'],
+            'remember' => ['nullable','boolean'],
+        ]);
+
+        if (! Auth::attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+        ], $credentials['remember'] ?? false)) {
+            RateLimiter::hit($key, 60);
+            throw ValidationException::withMessages([
+                'email' => ['Invalid credentials.'],
+            ]);
+        }
+
+        RateLimiter::clear($key);
+
+        $request->session()->regenerate();
+
+        return response()->noContent(); // 204, NINCS redirect
+    })->name('spa.login');
+
+    Route::post('/spa/logout', function (Request $request) {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return response()->noContent(); // 204
+    })->name('spa.logout');
+});
 
 require __DIR__.'/auth.php';
